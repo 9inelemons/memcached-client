@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  workflow_run:
+    workflows: [ "Codesniffer" ]
+    types:
+        - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
+
+      - name: Run memcache server
+        run: memcached -m 24 -p 11211
+
+      - name: Run tests
+        run: phpunit

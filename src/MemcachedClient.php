@@ -2,12 +2,14 @@
 
 namespace Painlofi\MemcachedClient;
 
-use Exception;
 use Memcache;
 use Painlofi\MemcachedClient\Exceptions\NotConnectedException;
 use Painlofi\MemcachedClient\Exceptions\ServerAlreadyAddedException;
 use Painlofi\MemcachedClient\Exceptions\ServerNotAddedException;
 
+/**
+ * Class to control Memcache state
+ */
 class MemcachedClient
 {
     private Memcache $memcache;
@@ -22,6 +24,8 @@ class MemcachedClient
     }
 
     /**
+     * Add server to Memcache server pool list
+     *
      * @throws ServerAlreadyAddedException
      */
     public static function addServer(string $host, int $port, string $alias): void
@@ -49,7 +53,46 @@ class MemcachedClient
     }
 
     /**
-     * @throws Exception
+     * Get value from Memcache server
+     *
+     * @param string $key
+     * @param int $flag
+     * @param string $serverAlias
+     * @return string|array|bool
+     * @throws NotConnectedException
+     * @throws ServerNotAddedException
+     */
+    public static function get(
+        string $key,
+        int $flag,
+        string $serverAlias
+    ): string|array|bool {
+        $client = static::getInstance();
+
+        if (!isset($client->serverPool[$serverAlias])) {
+            throw new ServerNotAddedException();
+        } else {
+            $server = $client->serverPool[$serverAlias];
+
+            if ($client->memcache->connect($server['host'], $server['port'])) {
+                return $client->memcache->get($key, $flag);
+            } else {
+                throw new NotConnectedException();
+            }
+        }
+    }
+
+    /**
+     * Set value on Memcache server
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param int $flag
+     * @param int $expire
+     * @param string $serverAlias
+     * @return bool
+     * @throws NotConnectedException
+     * @throws ServerNotAddedException
      */
     public static function set(
         string $key,
@@ -74,28 +117,10 @@ class MemcachedClient
     }
 
     /**
-     * @throws Exception
+     * Get server pool list
+     *
+     * @return array
      */
-    public static function get(
-        string $key,
-        int $flag,
-        string $serverAlias
-    ): string|array|bool {
-        $client = static::getInstance();
-
-        if (!isset($client->serverPool[$serverAlias])) {
-            throw new Exception('Server not added');
-        } else {
-            $server = $client->serverPool[$serverAlias];
-
-            if ($client->memcache->connect($server['host'], $server['port'])) {
-                return $client->memcache->get($key, $value, $flag);
-            } else {
-                throw new NotConnectedException();
-            }
-        }
-    }
-
     public static function getServerPool(): array
     {
         $client = static::getInstance();

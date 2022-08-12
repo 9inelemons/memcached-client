@@ -15,9 +15,12 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
 
-      - uses: niden/actions-memcached@v7
-      - name: Run memcache server
-        run: memcached -m 24 -p 11211
+      - name: Install dependencies
+        run: |
+            sudo apt-get update
+            sudo apt-get install libmemcached-dev memcached zlib1g-dev
+      - name: Start memcached daemons
+        run: memcached -d -p 11211
 
       - name: Run tests
         run: phpunit

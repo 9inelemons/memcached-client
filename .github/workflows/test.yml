@@ -15,9 +15,7 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-reqs
 
-      - name: install memcached server
-        run: apt-get install memcached
-
+      - uses: niden/actions-memcached@v7
       - name: Run memcache server
         run: memcached -m 24 -p 11211
 

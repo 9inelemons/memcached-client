@@ -49,7 +49,7 @@ class MemcachedClient
     }
 
     /**
-     * @throws Exception
+     * @throws ServerNotAddedException|NotConnectedException
      */
     public static function set(
         string $key,
@@ -74,7 +74,7 @@ class MemcachedClient
     }
 
     /**
-     * @throws Exception
+     * @throws ServerNotAddedException|NotConnectedException
      */
     public static function get(
         string $key,
@@ -84,7 +84,7 @@ class MemcachedClient
         $client = static::getInstance();
 
         if (!isset($client->serverPool[$serverAlias])) {
-            throw new Exception('Server not added');
+            throw new ServerNotAddedException();
         } else {
             $server = $client->serverPool[$serverAlias];
 

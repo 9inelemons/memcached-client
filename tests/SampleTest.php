@@ -6,9 +6,6 @@ use Painlofi\MemcachedClient\Exceptions\ServerAlreadyAddedException;
 use Painlofi\MemcachedClient\Exceptions\ServerNotAddedException;
 use Painlofi\MemcachedClient\MemcachedClient;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionObject;
-use ReflectionProperty;
 
 class SampleTest extends TestCase
 {
@@ -23,6 +20,9 @@ class SampleTest extends TestCase
         }
     }
 
+    /**
+     * @covers ServerNotAddedException::class
+     */
     public function testSetToNotAddedServer()
     {
         $this->expectException(ServerNotAddedException::class);
@@ -31,6 +31,10 @@ class SampleTest extends TestCase
         MemcachedClient::set($key, $value, 0, 3600, 'my_server');
     }
 
+    /**
+     * @covers MemcachedClient::set()
+     * @covers MemcachedClient::get()
+     */
     public function testSetAndGet()
     {
         $key = 'key';
@@ -40,6 +44,9 @@ class SampleTest extends TestCase
         $this->assertEquals($value, $result);
     }
 
+    /**
+     * @covers ServerAlreadyAddedException::class
+     */
     public function testAddServer()
     {
         $this->expectException(ServerAlreadyAddedException::class);
